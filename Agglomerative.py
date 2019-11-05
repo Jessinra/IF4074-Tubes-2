@@ -15,13 +15,13 @@ class Agglomerative:
     def set_linkage_function(self, linkage_type):
         #TODO: FILL the three dots
         if linkage_type == 'single':
-            self.linkage_function =  ...
+            self.linkage_function =  self.single_linkage
         elif linkage_type == 'complete':
-            self.linkage_function =  ...
+            self.linkage_function =  self.complete_linkage
         elif linkage_type == 'average':
-            self.linkage_function =  ...
+            self.linkage_function =  self.average_linkage
         elif linkage_type == 'average_group':
-            self.linkage_function =  ...
+            self.linkage_function =  self.average_group_linkage
 
     def init_group(self):
         self.num_of_group = self.data_length
