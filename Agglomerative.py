@@ -1,9 +1,6 @@
-LINKAGE_TYPE = {
-    'single': 1,
-    'complete': 2,
-    'avarage': 3,
-    'average_group': 4,
-}
+import math
+from common_library import euclidean_distance
+
 
 class Agglomerative:
     def __init__(self, data, k, linkage_type):
@@ -69,3 +66,37 @@ class Agglomerative:
 
     def get_all(self):
         return self.clusters
+
+    def single_linkage(self, points_a, points_b):
+        min_dist = math.inf
+        for idx_a in points_a:
+            for idx_b in points_b:
+                min_dist = min(min_dist, euclidean_distance(self.data[idx_a], self.data[idx_b]))
+        return min_dist
+
+    def complete_linkage(self, points_a, points_b):
+        max_dist = 0
+        for idx_a in points_a:
+            for idx_b in points_b:
+                max_dist = max(max_dist, euclidean_distance(self.data[idx_a], self.data[idx_b]))
+        return max_dist
+
+    def average_linkage(self, points_a, points_b):
+        dist = 0
+        num_of_pair = len(points_a) * len(points_b)
+        for idx_a in points_a:
+            for idx_b in points_b:
+                dist += euclidean_distance(self.data[idx_a], self.data[idx_b]) / num_of_pair
+        return dist
+
+    def average_group_linkage(self, points_a, points_b):
+        dimension = len(self.data[0])
+        avg_a = [0 for _ in range(dimension)]
+        avg_b = [0 for _ in range(dimension)]
+        for idx_a in points_a:
+            for i in range(dimension):
+                avg_a[i] += self.data[idx_a][i] / len(points_a)
+        for idx_b in points_b:
+            for i in range(dimension):
+                avg_b[i] += self.data[idx_b][i] / len(points_b)
+        return euclidean_distance(avg_a, avg_b)
