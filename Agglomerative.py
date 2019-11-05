@@ -57,6 +57,7 @@ class Agglomerative:
         for i in range(len(self.dist_array)):
             if self.dist_array[i][1] == group1 or self.dist_array[i][2] == group1:
                 self.dist_array = self.linkage_function(self.group[self.dist_array[i][1]], self.dist_array[i][2])
+        sorted(self.dist_array, key = lambda x : x[0])
 
     def set_cluster_groups(self):
         self.clusters = []
