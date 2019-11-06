@@ -1,9 +1,11 @@
+import copy
 import numpy as np
+from tqdm import tqdm
 
 
 class KMeans:
 
-    def __init__(self, k=2, tol=0.001, max_iter=100):
+    def __init__(self, k=2, tol=1e-9, max_iter=100):
         self.k = k
         self.tol = tol
         self.max_iter = max_iter
@@ -18,28 +20,29 @@ class KMeans:
         return self.predict(data)
 
     def fit(self, data):
-        self.data = data
+
+        self.data = copy.deepcopy(data)
         self._init_centroids()
 
-        for _ in range(self.max_iter):
+        for i in tqdm(range(self.max_iter)):
+
             self._init_clusters()
             self._distribute_data_to_cluster()
             self._recalculate_centroids()
-            self._evaluate_centroids()
+
+            if (i > 0):
+                self._evaluate_centroids()
 
             if self._optimized:
                 break
 
     def predict(self, data):
-        _distances = self._calculate_distances(data)
-        return self._get_closest_cluster(_distances)
-
-    def _init_centroids(self):
-        self.centroids = {}
-        self._prev_centroids = {}
-
-        np.random.shuffle(self.data)
-        self.centroids = {i: self.data[i] for i in range(self.k)}
+        clusters = []
+        for d in data:
+            _distances = self._calculate_distances(d)
+            _cluster = self._get_closest_cluster(_distances)
+            clusters.append(_cluster)
+        return clusters
 
     def _init_clusters(self):
         self.clusters = {i: [] for i in range(self.k)}
@@ -65,9 +68,16 @@ class KMeans:
         for c in self.centroids:
             _prev_cent = self._prev_centroids[c]
             _curr_cent = self.centroids[c]
-            if np.sum((_curr_cent - _prev_cent) / _prev_cent * 100.0) <= self.tol:
-                self._optimized = True
+
+            if self._euclidean_distance(_prev_cent, _curr_cent) > self.tol:
                 return
+        self._optimized = True
+
+    def _euclidean_distance(self, a, b):
+        dist = 0
+        for i in range(len(a)):
+            dist += (a[i] - b[i])**2
+        return dist ** 0.5
 
     def _get_closest_cluster(self, distances):
         return distances.index(min(distances))
@@ -75,3 +85,9 @@ class KMeans:
     def _calculate_distances(self, data):
         return [np.linalg.norm(data - self.centroids[centroid]) for centroid in self.centroids]
 
+    def _init_centroids(self):
+        self.centroids = {}
+        self._prev_centroids = {}
+
+        np.random.shuffle(self.data)
+        self.centroids = {i: self.data[i] for i in range(self.k)}
