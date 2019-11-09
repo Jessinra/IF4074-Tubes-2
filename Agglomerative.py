@@ -1,5 +1,5 @@
 import math
-from common_library import euclidean_distance
+from commons import euclidean_distance
 
 
 class Agglomerative:
@@ -34,7 +34,7 @@ class Agglomerative:
             j = i + 1
             while j < self.data_length:
                 self.dist_array.append((self.linkage_function(self.group[i], self.group[j]), i, j))
-        sorted(self.dist_array, key = lambda x : x[0])
+        self.dist_array = sorted(self.dist_array, key = lambda x : x[0])
 
     def fit(self):
         self.init_group()
@@ -54,7 +54,7 @@ class Agglomerative:
         for i in range(len(self.dist_array)):
             if self.dist_array[i][1] == group1 or self.dist_array[i][2] == group1:
                 self.dist_array = self.linkage_function(self.group[self.dist_array[i][1]], self.dist_array[i][2])
-        sorted(self.dist_array, key = lambda x : x[0])
+        self.dist_array = sorted(self.dist_array, key = lambda x : x[0])
 
     def set_cluster_groups(self):
         self.clusters = []
