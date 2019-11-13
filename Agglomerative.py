@@ -4,11 +4,11 @@ from commons import euclidean_distance
 
 
 class Agglomerative:
-    def __init__(self, data, k, linkage_type):
+    def __init__(self, data, k, linkage_type = 'single'):
         self.k = k
         self.data = np.array(data)
         self.data_length = len(data)
-        self.groups = []
+        self.group = []
         self.set_linkage_function(linkage_type)
         self.fit()
 
@@ -34,6 +34,7 @@ class Agglomerative:
             j = i + 1
             while j < self.data_length:
                 self.dist_array.append((self.linkage_function(self.group[i], self.group[j]), i, j))
+                j += 1
             i += 1
         self.dist_array = sorted(self.dist_array, key = lambda x : x[0])
 
@@ -54,11 +55,14 @@ class Agglomerative:
         self.dist_array = [item for item in self.dist_array if item[1] != group2 and item[2] != group2]
         for i in range(len(self.dist_array)):
             if self.dist_array[i][1] == group1 or self.dist_array[i][2] == group1:
-                self.dist_array = self.linkage_function(self.group[self.dist_array[i][1]], self.dist_array[i][2])
+                self.dist_array[i] = (self.linkage_function(
+                    self.group[self.dist_array[i][1]],
+                    self.group[self.dist_array[i][2]]
+                ), self.dist_array[i][1], self.dist_array[i][2])
         self.dist_array = sorted(self.dist_array, key = lambda x : x[0])
 
     def set_cluster(self):
-        self.groups = filter(lambda x: len(x) > 0, self.groups)
+        self.group = filter(lambda x: len(x) > 0, self.group)
         self.clusters = [None for _ in range(self.data_length)]
         curr_cluster = 0
         for party in self.group:
@@ -106,8 +110,8 @@ class Agglomerative:
 
     def average_group_linkage(self, points_a, points_b, b_single = False):
         dimension = len(self.data[0])
-        avg_a = np.array([0 for _ in range(dimension)])
-        avg_b = np.array([0 for _ in range(dimension)])
+        avg_a = np.array([0.0 for _ in range(dimension)])
+        avg_b = np.array([0.0 for _ in range(dimension)])
         for idx_a in points_a:
             avg_a += self.data[idx_a] / len(points_a)
         if b_single:
@@ -122,7 +126,7 @@ class Agglomerative:
         cluster = None
         point = np.array(point)
         for i in range(self.k):
-            distance = self.linkage_function(self.groups[i], point, True)
+            distance = self.linkage_function(self.group[i], point, True)
             if distance < min_dist:
                 min_dist = distance
                 cluster = i
