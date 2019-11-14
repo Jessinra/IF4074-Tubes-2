@@ -35,6 +35,7 @@ class KMeans:
                 break
 
     def predict(self, data):
+        data = np.array(data)
         clusters = []
         for d in data:
             _distances = self._calculate_distances(d)
