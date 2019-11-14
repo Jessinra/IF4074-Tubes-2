@@ -1,4 +1,4 @@
-import copy
+import copy, random
 import numpy as np
 from tqdm import tqdm
 
@@ -20,12 +20,10 @@ class KMeans:
         return self.predict(data)
 
     def fit(self, data):
-
-        self.data = copy.deepcopy(data)
+        self.data = copy.deepcopy(np.array(data))
         self._init_centroids()
 
         for i in tqdm(range(self.max_iter)):
-
             self._init_clusters()
             self._distribute_data_to_cluster()
             self._recalculate_centroids()
@@ -89,5 +87,6 @@ class KMeans:
         self.centroids = {}
         self._prev_centroids = {}
 
-        np.random.shuffle(self.data)
-        self.centroids = {i: self.data[i] for i in range(self.k)}
+        indices = [i for i in range(len(self.data))]
+        random.shuffle(indices)
+        self.centroids = {i: self.data[indices[i]] for i in range(self.k)}
