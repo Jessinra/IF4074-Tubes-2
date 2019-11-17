@@ -62,7 +62,7 @@ class Agglomerative:
         self.dist_array = sorted(self.dist_array, key = lambda x : x[0])
 
     def set_cluster(self):
-        self.group = filter(lambda x: len(x) > 0, self.group)
+        self.group = [g for g in self.group if len(g) > 0]
         self.clusters = [None for _ in range(self.data_length)]
         curr_cluster = 0
         for party in self.group:
